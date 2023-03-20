@@ -193,13 +193,13 @@ This file will clean the folder and allow you to restart the run.
 ***** Expected Outputs ***** 
 
 - *_relaxed_0.pdb
-This file is the RosettaII model, which has been relaxed. 
+This file is the RosettaMHCII model, which has been relaxed. 
 
 - binding_energies.csv
-This file should contain a list of Interface Energies (in Rosetta Energy Units) for each of the modeled peptide/HLA complexes.
+This file contains a list of Interface Energies (in Rosetta Energy Units) for each of the modeled peptide/HLA complexes.
 Lower energy means better predicted peptide/HLA binding.
 
 - Additional Analysis: Per Residue Energy
 
-see the per_residue_energy folder for a script to analysis the Per Residue Energy of each peptide/HLA interaction.
+see the per_residue_energy folder for a script to analyze the Per Residue Energy of each peptide residue while bound in the HLA groove.
 Look for patterns of low energy at the P1, P4, and P9 positions. This indicates a strong likelihood the peptide is a true binder.
