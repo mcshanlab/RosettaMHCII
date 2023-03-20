@@ -93,6 +93,8 @@ mv clustal-omega-1.2.3-macosx clustalo
 
 chmod u+x clustalo
 
+After, add alias for clustalo to .cshrc or .bashrc
+
 *Note if there is a security issue go to System Preferences > Security & Privacy > Allow the file clustalo
 
 {at time of testing clustalo 1.2.3}
