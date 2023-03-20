@@ -1,141 +1,205 @@
-# MHC-peptide threading protocol
+***** RosettaMHCII setup and installation on MacOS. Linux installation may require additional / different libraries. *****  
 
-## References
+At the time of testing MacOS Monterey v12.4
 
-* "RosettaMHC; Structure-based modeling of neoantigen/HLA complexes” Nerli et al., manuscript in preparation
+•    Install Xcode for Mac
 
-* Toor JS, Rao AA, McShan AC, Yarmarkovich M, Nerli S, Yamaguchi K, Madejska AA, Nguyen S, Tripathi S, Maris JM, Salama SR, Haussler D and Sgourakis NG (2018) A Recurrent Mutation in Anaplastic Lymphoma Kinase with Distinct Neoepitope Conformations. Front. Immunol. 9:99. doi: 10.3389/fimmu.2018.00099
+Visit the MacOS App Store
 
-## Introduction
+Search for Xcode
 
-RosettaMHC is an automated structure-based method used to study peptide/MHC-I biomolecular systems in a high-throughput manner. We can use this method to
+Download and install Xcode 
 
-* Model peptide/MHC-I structures and predict peptides that bind to MHC-I molecules,
-* Identify altered peptide ligands, and
-* Filter molecular chaperones that load or edit peptides in the MHC-I molecules.
+{at the time of testing Xcode v13.4.1)
 
-RosettaMHC uses homology modeling and energy minimization to predict structures of peptide/MHC-I/(chaperone or TCR) molecules. From the modeled complexes, interface analyses is carried out which reports on the affinities between (i) peptide and MHC-I, (ii) peptide/MHC-I and TCR, or (iii) peptide/MHC-I and chaperone. To run this method, a user has to provide X-ray antigen/MHC-I/(chaperone or TCR) (or template) structure alongside a list of names of MHC-I molecules, antigen and chaperone (or TCR) sequences (See Input files section below). RosettaMHC automatically prepares the template, aligns template and target sequences, performs homology modeling and energy minimization, and predicts binding affinities (See Algorithm section below). RosettaMHC is implemented using PyRosetta software libraries and supports MPI-based parallelization.
+•    Install Anaconda
 
-We carried out benchmark calculations using RosettaMHC and found that (i) the models of complexes are typically within 2 Å from the reference structures (tested using X-ray structures in the PDB) (See Reference) and (ii) predicted non-self-antigen with HLA-A*01 (a sub-group of MHC-I) model was very close to the solved X-ray structure (See Reference).
+Go to https://www.anaconda.com/products/distribution 
 
-Limitation: This method works when the sequences of antigens in both template and target are of same length.
+Download the latest anaconda distribution
 
-## Algorithm
+Then 
 
-RosettaMHC has following stages:
+conda create --name myenv
 
-* Treat template structure: This stage takes a given template structure in PDB format, cleans the PDB file, idealizes and refines it using respective Rosetta methods. This stage is optional. It can be performed using RosettaMHC protocol pipeline or performed individually using Rosetta binaries.
+y
 
-* Align template and target: This phase aligns sequences of given targets with template structure using Clustal Omega command line interface (See Software Requirements on how to obtain Clustal Omega). The alignment is stored in a Rosetta compatible alignment file called [grishin](https://www.rosettacommons.org/docs/latest/rosetta_basics/file_types/Grishan-format-alignment) file.
+conda activate myenv
 
-* Threading: Here, target sequence is threaded onto the template structure using partial_thread protocol in Rosetta.
+*Note that myenv should be active throughout the rest of the installation processes described below.  
+You can set conda activate myenv in your .login and .cshrc / .bashrc file so it runs in default for every terminal you open.
 
-* Refinement: The threaded structure is further refined using Rosetta's refinement protocol (called relax).
+•    Install pymol and biopython
 
-* Calculating binding affinities: Binding affinities can be calculated between (i) peptides and MHC molecules, (ii) peptide-MHC and TCR molecules, and (iii) MHC molecules and chaperones using InterfaceAnalyzer protocol in Rosetta.
+conda install -c schrodinger pymol
 
-We currently provide a database of MHC, beta2m and chaperone molecules. Each database file consists of following number of sequences. These sequences are obtained from the following sources:
+conda install -c conda-forge biopython
 
-MHC - 2895 sequences of length 180 amino acids obtained from EBI.
-MHC - 631 full-length sequences.
-beta2m - 5 full-length sequences.
-Chaperone - 2 full-length sequences.
+•    Install Rosetta
 
-## How to run this protocol?
+Go to https://www.rosettacommons.org/software/license-and-download
 
-### Software requirements
-This protocol requires the following libraries/binaries:
+Request an Academic License (Start Here)
 
-* Python3.x - Python3 is available for download [here](https://www.python.org/downloads/). Detailed instructions to install python for Linux and MacOS machines are available at [Guide for Linux machines](https://docs.python-guide.org/starting/install3/linux/) and [Guide for MacOS machines](https://docs.python-guide.org/starting/install3/osx/).
+Then Academic Download
 
-* [PyRosetta4](http://www.pyrosetta.org/dow)
+Download Rosetta 3.13 (Tuesday, June 1, 2021)
 
-* [Biopython](https://biopython.org/wiki/Download)
+Rosetta 3.13 source - as one bundle (5.2G)
 
-* Clustal omega (command line interface), which is available for download [here](http://www.clustal.org/omega/). The binary as per the operating system must be downloaded and renamed to clustalo. The PATH for clustalo has to be added to bashrc or pash_profile by using export PATH="<Path to clsutalo>":$PATH. 
+{At time of testing Rosetta 3.13}
 
-* [Rosetta](https://www.rosettacommons.org/software) (optional)
+tar -xvzf rosetta[releasenumber].tar.gz
 
-### Input Files
+cd rosetta*/main/source
 
-* A template PDB (required). This file is required to thread a target sequence onto it.
+./scons.py -j 8 mode=release bin
 
-* MHC list file. This is the file that contains list of MHC molecules named in standard format. For example: A*02:01. The list of supported HLA sequences can be viewed using a command line shown under Examples section.
+After, add path to Rosetta to .cshrc or .bashrc
 
-* Peptide list file. This is a file containing list of peptide sequences in fasta format.
+For more instructions on how to install Rosetta please see https://new.rosettacommons.org/demos/latest/tutorials/install_build/install_build 
 
-* TCR sequence file. This is a file containing list of TCR sequences in fasta format.
+*Note if there is a security issue go to System Preferences > Security & Privacy > Allow the file
 
-* Chaperone list file. This is a file similar to MHC list file. Currently, we only have tapasin and tapbpr sequences in our database. If you don't want to provide chaperones, you need not provide the file or simply add "none" in the chaperone list file.
+•    Install PyRosetta
 
-* beta2m list file. This is a file similar to MHC list file. Currently, we have sequences for human, mouse, chicken, cow and rat beta2m in our database. If you don't want to provide beta2m sequence, you need not provide the file or simply add "none" in the beta2m list file.
+Obtain Rosetta license from to receive a username and password.
 
-### Output Files
+Download the appropriate version of PyRosetta
+https://www.pyrosetta.org/downloads 
 
-* Cleaned template PDB file. Subsequently, if a template is idealized and relaxed in the pipeline, the idealized and refined structure is also produced.
+{at time of testing PyRosetta4.Release.python38.mac.release-321.tar.bz2}
 
-* Clustal omega input fasta file and corresponding alignment file.
+tar -vjxf PyRosetta4.Release.python38.mac.release-321.tar.bz2
 
-* Target sequence fasta file.
+cd PyRosetta4.Release.python38.mac.release-321
 
-* Rosetta format alignment file (grishin).
+cd setup && sudo python setup.py install
 
-* [Movemap](https://www.rosettacommons.org/docs/latest/rosetta_basics/file_types/movemap-file) file .
+python3
 
-* Corresponding threaded PDB and refined files.
+import pyrosetta; pyrosetta.init()
 
-* A csv file containing binding affinity measure (as per Rosetta energy function).
+*Note if there is a security issue go to System Preferences > Security & Privacy > Allow the file rosetta.so
 
-## Basic options
+•    Install ClustalOmega
 
-    * -list_mhcs : Lists all the MHCs for which sequences are available in the database.
+Go to http://www.clustal.org/omega/ 
 
-    * -template_pdb : Provide template structure in PDB to perform threading.
+Under Precompiled binaries 
+download Standalone Mac binary (PowerPC/64-bit Intel) (1.2.3)
 
-    * -mhcs : Provide the list of names of MHCs in the file, if you want to include all, just type "all" in the file.
+mv clustal-omega-1.2.3-macosx clustalo
 
-    * -beta2m :Provide the file containing names of beta2m, Choices include: [humanbeta2m, mousebeta2m, chickenbeta2m, bovinebeta2m, ratbeta2m, none].
+chmod u+x clustalo
 
-    * -peptides : Provide fasta file with peptide sequences that need to be threaded.
+*Note if there is a security issue go to System Preferences > Security & Privacy > Allow the file clustalo
 
-    * -tcr : Provide the file containing tcr sequence in fasta format.
+{at time of testing clustalo 1.2.3}
 
-    * -chaperone : Provide the file containing names of chaperones, Choices include: [tapasin, tapbpr, none].
+•    Install gnuplot
 
-    * -mhc_trim_length : Provide the number of residue from which the mhc should be trimmed, default value=181)
+gnuplot is used for plotting purposes
 
-    * -no_trim_mhc : Should we model the whole complex.
+conda install -c conda-forge libgd 
 
-    * -idealize_relax : idealize and relax template structure before threading.
+then
 
-    * -relax_after_threading : idealize and relax template structure before threading.
+conda install -c conda-forge gnuplot
 
-    * -mhc_chain : Provide mhc chain id in the template.
+{at time of testing gnuplot Version 5.4 patchlevel 3}
 
-    * -peptide_chain : Provide peptide chain id in the template.
+***** Example Run ***** 
 
-    * -pep_start_index : Provide peptide start index.
+See the "example_demos" folder for example runs for HLA-DR, HLA-DQ, and HLA-DP complexes.
 
-    * -groove_distance : Provide distance to select nearest groove residues from the peptide, default value=3.5 Å
+Each folder should contain the following files:
 
-    * -interface_cutpoint : Last residue index that separates the interfaces for which you are calculating binding energies, default value = 0.
+- run.sh
+This file contains all the commands needed to run RosettaMHCII. 
+The commands in these files have been tailored for each allele class because the length of the allele sequences are different:
 
-    * -out_file : Output file name in csv format to write the binding energies", default name="binding_energies.csv".
+* For HLA-DR
 
-    * -nstruct : number of times a threaded structure should be relaxed", type=int, default value=1.
+for filename in *.pdb;do
 
-## Examples
+name=`basename $filename`
 
-Below are the examples that showcase how RosettaMHC can be utilized to understand MHC-peptide/MHC-peptide-TCR/MHC-Chaperone systems.
+python3 ../../main.py -template_pdb "$name" -nstruct 3 -relax_after_threading -mhciialpha mhciialpha_list -mhciibeta mhciibeta_list -peptides pep_list -mhciialpha_chain A -mhciibeta_chain B -peptide_chain C -no_trim_mhc -pep_start_index 368 -interface_cutpoint 367 -groove_distance 10
 
-### Modeling MHC-peptide complexes
+done
 
-Example scripts in run.sh or mpi_run.sh used to model and extract binding energies of peptides to MHCs can be found under examples/example-thread-peptide.
 
-### Modeling MHC-peptide-TCR complexes
+* For HLA-DQ
 
-Example scripts in run.sh or mpi_run.sh used to model and extract binding energies of peptides-MHCs to TCR molecules can be found under examples/example-thread-tcr.
 
-### Modeling MHC-Chaperone complexes
+for filename in *.pdb;do
 
-Example scripts in run.sh or mpi_run.sh used to model and extract binding energies of MHCs to chaperone molecules can be found under examples/example-thread-chaperone.
+name=`basename $filename`
+
+python3 ../../main.py -template_pdb "$name" -nstruct 3 -relax_after_threading -mhciialpha mhciialpha_list -mhciibeta mhciibeta_list -peptides pep_list -mhciialpha_chain A -mhciibeta_chain B -peptide_chain C -no_trim_mhc -pep_start_index 364 -interface_cutpoint 363 -groove_distance 10
+
+done
+
+
+
+* For HLA-DP
+
+
+for filename in *.pdb;do
+
+name=`basename $filename`
+
+python3 ../../main.py -template_pdb "$name" -nstruct 3 -relax_after_threading -mhciialpha mhciialpha_list -mhciibeta mhciibeta_list -peptides pep_list -mhciialpha_chain A -mhciibeta_chain B -peptide_chain C -no_trim_mhc -pep_start_index 366 -interface_cutpoint 365 -groove_distance 10
+
+done
+
+
+- template PDB
+This file is the PDB template used by RosettaMHCII for modeling.
+You will find curated templates in the database/PDBs folder. Each of these files has been manually curated for accuracy of the program (modeled missing residues, fixed chain IDs, etc).
+
+Important note for use of templates:
+You MUST use a PDB template with the same HLA class (DR, DP, DQ), peptide length (i.e., 13mer), peptide binding register (i.e., reg3) as the peptide / HLA complex you want to model. If this condition is not met, modeling will not be accurate.
+One PDB template should be sufficient for modeling of most problems. However, you may compare multiple templates in the run.sh script with a command to grab all available templates corresponding to your allele class and binding register:
+
+cp ../../database/PDBs/*DR-13mer-reg3*.pdb .
+
+- pep_list
+The file provides a list of the peptide(s) you want to model in FASTA format.
+example:
+>PKYVKQNTLKLAT
+PKYVKQNTLKLAT
+
+- mhciialpha_list
+This file provides the name of the class II HLA alpha chain allele to be modeled.
+example:
+HLA-DRA*01:01:01:01
+
+Note that a list of all available HLA alpha chain alleles are listed in databases/mhciialpha.py
+If the allele you want to model is not listed there, you can add it manually but it must be the same length as the other alleles in that class (DR, DQ, DP).
+
+- mhciibeta_list
+This file provides the name of the class II HLA beta chain allele to be modeled
+example:
+HLA-DRB1*01:01:01:01
+
+Note that all available HLA alpha chain alleles are listed in databases/mhciibeta.py
+If the allele you want to model is not listed there, you can add it manually but it must be the same length as the other alleles in that class (DR, DQ, DP).
+
+- clean.sh
+This file will clean the folder and allow you to restart the run.
+
+***** Expected Outputs ***** 
+
+- *_relaxed_0.pdb
+This file is the RosettaII model, which has been relaxed. 
+
+- binding_energies.csv
+This file should contain a list of Interface Energies (in Rosetta Energy Units) for each of the modeled peptide/HLA complexes.
+Lower energy means better predicted peptide/HLA binding.
+
+- Additional Analysis: Per Residue Energy
+
+see the per_residue_energy folder for a script to analysis the Per Residue Energy of each peptide/HLA interaction.
+Look for patterns of low energy at the P1, P4, and P9 positions. This indicates a strong likelihood the peptide is a true binder.
