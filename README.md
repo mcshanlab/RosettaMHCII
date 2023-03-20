@@ -168,8 +168,8 @@ cp ../../database/PDBs/*DR-13mer-reg3*.pdb .
 - pep_list
 The file provides a list of the peptide(s) you want to model in FASTA format.
 example:
->PKYVKQNTLKLAT
-PKYVKQNTLKLAT
+">PKYVKQNTLKLAT
+PKYVKQNTLKLAT"
 
 - mhciialpha_list
 This file provides the name of the class II HLA alpha chain allele to be modeled.
