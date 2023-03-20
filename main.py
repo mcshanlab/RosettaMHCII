@@ -1,19 +1,17 @@
 #!/usr/bin/env python3
 
-#       Sgourakis Lab
-#   Author: Santrupti Nerli
-#   Date: February 2, 2018
-#   Email: snerli@ucsc.edu
-#
+#   Base code by Santrupti Nerli Feb 2018 for MHCI
+#   Updated by Andrew McShan Feb 2021 for MHCII
 
 # Load the Rosetta commands for use in the Python shell
 from pyrosetta import *
 
-#custom libraries
+#import custom libraries for model, argparse and mhc databases
 from model import MODEL
 from input_output.input.argparser import ARGPARSE
 from database.HLA_sequences_180 import hla_sequences_180
-from database.HLA_sequences_complex import hla_sequences
+from database.mhciialpha import mhciialpha
+from database.mhciibeta import mhciibeta
 
 # import other required libraries
 import os
@@ -37,12 +35,12 @@ def run():
         else:
             for key,value in hla_sequences_180.items():
                 print(key)
+
     else:
         # Load Rosetta database files
         init(options='')
         modeller = MODEL(args)
-        modeller.model_mhc_for_each_peptide_beta2m_tcr_chaperone()
-
+        modeller.model_mhc_for_each_peptide_beta2m_tcr_chaperone_mhciialpha_mhciibeta()
 
 if __name__ == "__main__":
     run()

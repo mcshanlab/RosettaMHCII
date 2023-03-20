@@ -45,3 +45,7 @@ class RMSD:
     def all_atom_rmsd(self):
         rms_all = pyrosetta.rosetta.core.scoring.all_atom_rmsd(self.native_pose, self.pose)
         return rms_all
+
+    def all_atom_rmsd_residue_number(self, resi_vec):
+        rms_all = pyrosetta.rosetta.core.scoring.all_atom_rmsd(self.native_pose, self.pose, resi_vec)
+        return rms_all

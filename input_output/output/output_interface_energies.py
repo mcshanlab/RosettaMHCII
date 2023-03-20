@@ -29,7 +29,7 @@ class OUT_INTERFACE_ENERGY:
 
     # method to populate dictionary with binding energies
     def add(self, key, value, rms1 = -1, rms2 = -1):
-        fields = key.split("_")[:4]
+        fields = key.split("_")[:8]
         if rms1 == -1 and rms2 == -1:
             self.energies[key].append(value)
         else:
@@ -50,12 +50,17 @@ class OUT_INTERFACE_ENERGY:
             pep = fields[2]
             tcr = fields[3]
             chaperone = fields[4]
+            mhciialpha = fields[5]
+            mhciibeta = fields[6]
+            template = fields[8]
             energy = ""
             for i in range(len(value)):
                 energy += str(value[i])
                 if i != len(value)-1:
                     energy += ","
-            text = mhc+","+beta2m+","+pep+","+tcr+","+chaperone+","+energy+"\n"
+            text = mhc+","+beta2m+","+pep+","+tcr+","+chaperone+","+mhciialpha+","+mhciibeta+","+template+","+energy+"\n"
+            legend = "MHC-I allele"",""Beta2m"",""Peptide"",""TCR"",""Chaperone"",""MHC-II alpha allele"",""MHC-II beta allele"",""Template PDB"",""Energy"+"\n"
             write_file_handler.write(text)
+            print(legend)
             print (text)
         write_file_handler.close()

@@ -1,10 +1,7 @@
 #!/usr/bin/python
 
-#       Sgourakis Lab
-#   Author: Santrupti Nerli
-#   Date: April 10, 2017
-#   Email: snerli@ucsc.edu
-#
+#   Base code by Santrupti Nerli Feb 2018 for MHCI
+#   Updated by Andrew McShan Feb 2021 for MHCII
 
 # Load the Rosetta commands for use in the Python shell
 from pyrosetta import *
@@ -19,6 +16,8 @@ from input_output.input.peptides import PEPTIDE
 from input_output.input.beta2m import BETA2M
 from input_output.input.chaperone import CHAPERONE
 from input_output.input.tcr import TCR
+from input_output.input.mhciialpha import MHCIIALPHA
+from input_output.input.mhciibeta import MHCIIBETA
 
 # import other required libraries
 import os
@@ -46,12 +45,14 @@ class MODEL:
         self.args = args
 
     # method to model mhcs for given peptide, beta2m, tcr or chaperone sequences
-    def model_mhc_for_each_peptide_beta2m_tcr_chaperone(self):
+    def model_mhc_for_each_peptide_beta2m_tcr_chaperone_mhciialpha_mhciibeta(self):
         mhc = MHC(self.args.get_mhcs(), self.args.is_no_trim_mhc_flag_set())
         beta2m = BETA2M(self.args.get_beta2m())
         peptides = PEPTIDE(self.args.get_peptides())
         chaperones = CHAPERONE(self.args.get_chaperone())
         tcr = TCR(self.args.get_tcr())
+        mhciialpha = MHCIIALPHA(self.args.get_mhciialpha(), self.args.is_no_trim_mhc_flag_set())
+        mhciibeta = MHCIIBETA(self.args.get_mhciibeta(), self.args.is_no_trim_mhc_flag_set())
 
         if ( len(peptides.get_headers()) > 1 ):
             if ( self.args.get_pep_start_index() == 0 ):
@@ -77,9 +78,11 @@ class MODEL:
                 for pep_header in peptides.get_headers():
                     for tcr_header in tcr.get_headers():
                         for chaperone_header in chaperones.get_headers():
-                            header = mhc_header+"_"+beta2m_header+"_"+pep_header+"_"+tcr_header+"_"+chaperone_header
-                            sequence = mhc.get_sequence(mhc_header)+beta2m.get_sequence(beta2m_header)+peptides.get_sequence(pep_header)+tcr.get_sequence(tcr_header)+chaperones.get_sequence(chaperone_header)
-                            self.generate_fasta(header, sequence)
+                            for mhciialpha_header in mhciialpha.get_headers():
+                                for mhciibeta_header in mhciibeta.get_headers():
+                                    header = mhc_header+"_"+beta2m_header+"_"+pep_header+"_"+tcr_header+"_"+chaperone_header+"_"+mhciialpha_header+"_"+mhciibeta_header
+                                    sequence = mhc.get_sequence(mhc_header)+mhciialpha.get_sequence(mhciialpha_header)+mhciibeta.get_sequence(mhciibeta_header)+beta2m.get_sequence(beta2m_header)+peptides.get_sequence(pep_header)+tcr.get_sequence(tcr_header)+chaperones.get_sequence(chaperone_header)
+                                    self.generate_fasta(header, sequence)
 
         # identify the number of jobs
         njobs = len(self.complex_sequences)
